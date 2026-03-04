@@ -1,450 +1,294 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Real-Time Age Calculator</title>
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Premium Age Calculator</title>
   <style>
     :root {
-      --bg: #0f172a;
-      --card-bg: #020617;
-      --accent: #38bdf8;
-      --accent-soft: rgba(56, 189, 248, 0.15);
-      --text-main: #f9fafb;
-      --text-muted: #9ca3af;
-      --error: #f97373;
-      --border-subtle: rgba(148, 163, 184, 0.35);
-      --radius-lg: 20px;
-      --shadow-soft: 0 24px 60px rgba(15, 23, 42, 0.7);
+      --primary: #6366f1;
+      --primary-hover: #4f46e5;
+      --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      --glass-bg: rgba(255, 255, 255, 0.95);
+      --text-main: #1f2937;
+      --text-muted: #6b7280;
     }
 
-    *,
-    *::before,
-    *::after {
+    * {
+      margin: 0;
+      padding: 0;
       box-sizing: border-box;
     }
 
-    html,
     body {
-      height: 100%;
-      margin: 0;
-      padding: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
-        "Segoe UI", sans-serif;
-      background: radial-gradient(circle at top, #1e293b 0, #020617 55%, #000 100%);
-      color: var(--text-main);
-    }
-
-    body {
+      background: var(--bg-gradient);
+      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      min-height: 100vh;
       display: flex;
-      justify-content: center;
       align-items: center;
-      padding: 16px;
+      justify-content: center;
+      padding: 20px;
     }
-
-    .app-wrapper {
-      width: 100%;
-      max-width: 480px;
-    }
-
-    /* Card */
 
     .card {
-      background: radial-gradient(circle at top left, #0b1120 0, #020617 55%);
-      border-radius: var(--radius-lg);
-      padding: 28px 24px 24px;
-      box-shadow: var(--shadow-soft);
-      border: 1px solid rgba(148, 163, 184, 0.25);
-      backdrop-filter: blur(18px);
-      position: relative;
-      overflow: hidden;
+      background: var(--glass-bg);
+      backdrop-filter: blur(10px);
+      border-radius: 24px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      width: 100%;
+      max-width: 500px;
+      padding: 40px;
+      text-align: center;
+      animation: fadeIn 0.6s ease-out;
     }
 
-    .card::before {
-      content: "";
-      position: absolute;
-      width: 220px;
-      height: 220px;
-      background: radial-gradient(circle, rgba(56, 189, 248, 0.17), transparent 70%);
-      top: -90px;
-      right: -80px;
-      pointer-events: none;
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
-    .card::after {
-      content: "";
-      position: absolute;
-      width: 140px;
-      height: 140px;
-      background: radial-gradient(circle, rgba(129, 140, 248, 0.16), transparent 70%);
-      bottom: -60px;
-      left: -40px;
-      pointer-events: none;
+    h2 {
+      font-size: 2rem;
+      color: var(--text-main);
+      margin-bottom: 8px;
+      font-weight: 800;
+      text-transform: lowercase;
     }
 
-    /* Content */
-
-    .card-header {
-      position: relative;
-      z-index: 1;
-      margin-bottom: 22px;
-    }
-
-    .card-header h1 {
-      font-size: 1.6rem;
-      letter-spacing: 0.03em;
-      margin: 0 0 6px;
-    }
-
-    .card-header p {
-      margin: 0;
+    .subhead {
       font-size: 0.9rem;
       color: var(--text-muted);
+      margin-bottom: 30px;
     }
 
-    /* Input */
-
-    .card-body {
-      position: relative;
-      z-index: 1;
+    .selectors {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 25px;
     }
 
-    .input-group {
-      margin-bottom: 18px;
+    .select-group {
+      display: flex;
+      flex-direction: column;
+      text-align: left;
     }
 
-    .input-group label {
-      display: block;
-      font-size: 0.85rem;
-      letter-spacing: 0.06em;
+    .select-group label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--primary);
       text-transform: uppercase;
-      color: var(--text-muted);
       margin-bottom: 6px;
+      margin-left: 4px;
     }
 
-    .input-group input[type="date"] {
+    select {
       width: 100%;
-      padding: 10px 12px;
-      border-radius: 999px;
-      border: 1px solid var(--border-subtle);
-      background: rgba(15, 23, 42, 0.9);
+      padding: 12px;
+      border: 2px solid #e5e7eb;
+      border-radius: 12px;
+      font-size: 1rem;
       color: var(--text-main);
-      font-size: 0.95rem;
-      outline: none;
-      transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
-    }
-
-    .input-group input[type="date"]:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.4);
-      background: rgba(15, 23, 42, 1);
-    }
-
-    .input-group input[type="date"]::-webkit-calendar-picker-indicator {
-      filter: invert(0.8);
+      background: white;
       cursor: pointer;
+      transition: all 0.2s;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236366f1'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='Stack19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      background-size: 18px;
+    }
+
+    select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+    }
+
+    .calculate-btn {
+      background: var(--primary);
+      color: white;
+      border: none;
+      width: 100%;
+      padding: 16px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      margin-bottom: 30px;
+    }
+
+    .calculate-btn:hover {
+      background: var(--primary-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.3);
+    }
+
+    .calculate-btn:active { transform: translateY(0); }
+
+    .result-box {
+      background: #f8fafc;
+      border-radius: 20px;
+      padding: 24px;
+      border: 1px dashed #cbd5e1;
+    }
+
+    .age-text {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--text-main);
+      line-height: 1.6;
+    }
+
+    .age-number {
+      color: var(--primary);
+      font-size: 1.5rem;
+      display: block;
+      margin-top: 5px;
     }
 
     .error-message {
-      min-height: 18px;
-      margin: 6px 2px 0;
-      font-size: 0.8rem;
-      color: var(--error);
+      color: #ef4444;
+      font-weight: 600;
+      font-size: 0.95rem;
     }
 
-    /* Age grid */
-
-    .age-grid {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 10px;
-      margin-top: 10px;
-    }
-
-    .age-item {
-      padding: 10px 10px;
-      border-radius: 14px;
-      border: 1px solid rgba(148, 163, 184, 0.3);
-      background: linear-gradient(
-        145deg,
-        rgba(15, 23, 42, 0.96),
-        rgba(15, 23, 42, 0.8)
-      );
-      box-shadow: 0 10px 25px rgba(15, 23, 42, 0.6);
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-      min-height: 68px;
-    }
-
-    .age-label {
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
+    .creator-credit {
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid #f1f5f9;
+      font-size: 0.85rem;
       color: var(--text-muted);
     }
 
-    .age-value {
-      font-size: 1.35rem;
-      font-variant-numeric: tabular-nums;
-      color: var(--accent);
-    }
+    .creator-credit strong { color: var(--primary); }
 
-    /* Footer */
-
-    .footer {
-      margin-top: 14px;
-      text-align: center;
-      font-size: 0.8rem;
-      color: var(--text-muted);
-    }
-
-    /* Responsive */
-
+    /* Mobile adjustments */
     @media (max-width: 480px) {
-      .card {
-        padding: 22px 18px 18px;
-      }
-
-      .card-header h1 {
-        font-size: 1.4rem;
-      }
-
-      .age-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-
-      .age-item {
-        min-height: 64px;
-      }
-
-      .age-value {
-        font-size: 1.25rem;
-      }
-    }
-
-    @media (prefers-reduced-motion: no-preference) {
-      .card {
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-      }
-
-      .card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 28px 80px rgba(15, 23, 42, 0.8);
-      }
+      .card { padding: 30px 20px; }
+      .selectors { grid-template-columns: 1fr; gap: 15px; }
+      h2 { font-size: 1.6rem; }
     }
   </style>
 </head>
 <body>
-  <div class="app-wrapper">
-    <main class="card">
-      <header class="card-header">
-        <h1>Real-Time Age Calculator</h1>
-        <p>Enter your date of birth to see your age update live.</p>
-      </header>
 
-      <section class="card-body">
-        <div class="input-group">
-          <label for="dob">Date of Birth</label>
-          <input type="date" id="dob" />
-          <p class="error-message" id="error-message"></p>
-        </div>
+  <div class="card">
+    <h2>age calculator</h2>
+    <p class="subhead">Select your birth date precisely</p>
 
-        <div class="age-grid" id="age-grid">
-          <div class="age-item">
-            <span class="age-label">Years</span>
-            <span class="age-value" id="years">--</span>
-          </div>
-          <div class="age-item">
-            <span class="age-label">Months</span>
-            <span class="age-value" id="months">--</span>
-          </div>
-          <div class="age-item">
-            <span class="age-label">Days</span>
-            <span class="age-value" id="days">--</span>
-          </div>
-          <div class="age-item">
-            <span class="age-label">Hours</span>
-            <span class="age-value" id="hours">--</span>
-          </div>
-          <div class="age-item">
-            <span class="age-label">Minutes</span>
-            <span class="age-value" id="minutes">--</span>
-          </div>
-          <div class="age-item">
-            <span class="age-label">Seconds</span>
-            <span class="age-value" id="seconds">--</span>
-          </div>
-        </div>
-      </section>
-    </main>
+    <div class="selectors">
+      <div class="select-group">
+        <label>Year</label>
+        <select id="year"></select>
+      </div>
+      <div class="select-group">
+        <label>Month</label>
+        <select id="month"></select>
+      </div>
+      <div class="select-group">
+        <label>Day</label>
+        <select id="day"></select>
+      </div>
+    </div>
 
-    <footer class="footer">
-      Credit: Abdul Hakim
-    </footer>
+    <button class="calculate-btn" id="calculateBtn">Calculate Now</button>
+
+    <div id="outputArea" class="result-box">
+      <div class="age-text" id="resultDisplay">Select date and click calculate</div>
+    </div>
+
+    <div class="creator-credit">
+      Crafted by <strong>Abdul Hakim</strong>
+    </div>
   </div>
 
   <script>
-    // Grab DOM elements
-    const dobInput = document.getElementById("dob");
-    const errorMessage = document.getElementById("error-message");
+    (function() {
+      const yearSel = document.getElementById('year');
+      const monthSel = document.getElementById('month');
+      const daySel = document.getElementById('day');
+      const outputArea = document.getElementById('outputArea');
+      
+      const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
-    const yearsEl = document.getElementById("years");
-    const monthsEl = document.getElementById("months");
-    const daysEl = document.getElementById("days");
-    const hoursEl = document.getElementById("hours");
-    const minutesEl = document.getElementById("minutes");
-    const secondsEl = document.getElementById("seconds");
-
-    let timerId = null;
-
-    function setMaxDateToToday() {
-      const today = new Date();
-      const yyyy = today.getFullYear();
-      const mm = String(today.getMonth() + 1).padStart(2, "0");
-      const dd = String(today.getDate()).padStart(2, "0");
-      const formatted = `${yyyy}-${mm}-${dd}`;
-      dobInput.max = formatted;
-    }
-
-    function resetDisplay() {
-      yearsEl.textContent = "--";
-      monthsEl.textContent = "--";
-      daysEl.textContent = "--";
-      hoursEl.textContent = "--";
-      minutesEl.textContent = "--";
-      secondsEl.textContent = "--";
-    }
-
-    function getValidBirthDate() {
-      const value = dobInput.value;
-
-      if (!value) {
-        errorMessage.textContent = "Please select your date of birth.";
-        resetDisplay();
-        return null;
+      function isLeapYear(y) { return (y % 4 === 0 && y % 100 !== 0) || (y % 400 === 0); }
+      function getDaysInMonth(m, y) {
+        if (m === 2) return isLeapYear(y) ? 29 : 28;
+        return [4, 6, 9, 11].includes(m) ? 30 : 31;
       }
 
-      const birthDate = new Date(value);
-      const now = new Date();
-
-      if (birthDate.getTime() > now.getTime()) {
-        errorMessage.textContent = "Date of birth cannot be in the future.";
-        resetDisplay();
-        return null;
-      }
-
-      errorMessage.textContent = "";
-      return birthDate;
-    }
-
-    function calculateDetailedAge(birthDate) {
-      const now = new Date();
-
-      let years = now.getFullYear() - birthDate.getFullYear();
-      const yearAdjusted = new Date(
-        birthDate.getFullYear() + years,
-        birthDate.getMonth(),
-        birthDate.getDate(),
-        birthDate.getHours(),
-        birthDate.getMinutes(),
-        birthDate.getSeconds()
-      );
-
-      if (yearAdjusted > now) {
-        years--;
-      }
-
-      const afterYears = new Date(
-        birthDate.getFullYear() + years,
-        birthDate.getMonth(),
-        birthDate.getDate(),
-        birthDate.getHours(),
-        birthDate.getMinutes(),
-        birthDate.getSeconds()
-      );
-
-      let months = 0;
-      let temp = new Date(afterYears);
-      while (true) {
-        const next = new Date(
-          temp.getFullYear(),
-          temp.getMonth() + 1,
-          temp.getDate(),
-          temp.getHours(),
-          temp.getMinutes(),
-          temp.getSeconds()
-        );
-        if (next <= now) {
-          months++;
-          temp = next;
-        } else {
-          break;
+      function init() {
+        const currentYear = new Date().getFullYear();
+        for (let y = currentYear; y >= 1900; y--) {
+          yearSel.options.add(new Option(y, y));
         }
+        monthNames.forEach((name, i) => {
+          monthSel.options.add(new Option(name, i + 1));
+        });
+        
+        yearSel.value = 2000;
+        monthSel.value = 1;
+        updateDays();
       }
 
-      const afterMonths = new Date(temp);
-
-      let remainingMs = now.getTime() - afterMonths.getTime();
-
-      const msPerSecond = 1000;
-      const msPerMinute = msPerSecond * 60;
-      const msPerHour = msPerMinute * 60;
-      const msPerDay = msPerHour * 24;
-
-      const days = Math.floor(remainingMs / msPerDay);
-      remainingMs -= days * msPerDay;
-
-      const hours = Math.floor(remainingMs / msPerHour);
-      remainingMs -= hours * msPerHour;
-
-      const minutes = Math.floor(remainingMs / msPerMinute);
-      remainingMs -= minutes * msPerMinute;
-
-      const seconds = Math.floor(remainingMs / msPerSecond);
-
-      return { years, months, days, hours, minutes, seconds };
-    }
-
-    function renderAge(age) {
-      yearsEl.textContent = age.years;
-      monthsEl.textContent = age.months;
-      daysEl.textContent = age.days;
-      hoursEl.textContent = age.hours;
-      minutesEl.textContent = age.minutes;
-      secondsEl.textContent = age.seconds;
-    }
-
-    function startAgeTimer() {
-      const birthDate = getValidBirthDate();
-      if (!birthDate) {
-        if (timerId !== null) {
-          clearInterval(timerId);
-          timerId = null;
+      function updateDays() {
+        const m = parseInt(monthSel.value);
+        const y = parseInt(yearSel.value);
+        const days = getDaysInMonth(m, y);
+        const currentDay = daySel.value;
+        
+        daySel.innerHTML = '';
+        for (let d = 1; d <= days; d++) {
+          daySel.options.add(new Option(d, d));
         }
-        return;
+        daySel.value = currentDay <= days ? currentDay : 1;
       }
 
-      if (timerId !== null) {
-        clearInterval(timerId);
+      function calculate() {
+        const y = parseInt(yearSel.value);
+        const m = parseInt(monthSel.value);
+        const d = parseInt(daySel.value);
+        
+        const birthDate = new Date(y, m - 1, d);
+        const today = new Date();
+        today.setHours(0,0,0,0);
+
+        if (birthDate > today) {
+          outputArea.innerHTML = `<span class="error-message">Error: Future date selected!</span>`;
+          return;
+        }
+
+        let years = today.getFullYear() - birthDate.getFullYear();
+        let months = today.getMonth() - birthDate.getMonth();
+        let days = today.getDate() - birthDate.getDate();
+
+        if (days < 0) {
+          months--;
+          const lastMonth = new Date(today.getFullYear(), today.getMonth(), 0).getDate();
+          days += lastMonth;
+        }
+        if (months < 0) {
+          years--;
+          months += 12;
+        }
+
+        outputArea.innerHTML = `
+          <div class="age-text">
+            You are currently
+            <span class="age-number">${years} years, ${months} months, ${days} days old</span>
+          </div>
+        `;
       }
 
-      const initialAge = calculateDetailedAge(birthDate);
-      renderAge(initialAge);
-
-      timerId = setInterval(() => {
-        const age = calculateDetailedAge(birthDate);
-        renderAge(age);
-      }, 1000);
-    }
-
-    function init() {
-      setMaxDateToToday();
-      dobInput.addEventListener("change", startAgeTimer);
-    }
-
-    init();
+      yearSel.onchange = updateDays;
+      monthSel.onchange = updateDays;
+      document.getElementById('calculateBtn').onclick = calculate;
+      
+      init();
+    })();
   </script>
 </body>
 </html>
