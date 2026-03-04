@@ -299,10 +299,6 @@
 
     let timerId = null;
 
-    /**
-     * Set the maximum selectable date on the date picker to "today"
-     * so the user cannot select a future date.
-     */
     function setMaxDateToToday() {
       const today = new Date();
       const yyyy = today.getFullYear();
@@ -312,9 +308,6 @@
       dobInput.max = formatted;
     }
 
-    /**
-     * Reset displayed age values to the placeholder state.
-     */
     function resetDisplay() {
       yearsEl.textContent = "--";
       monthsEl.textContent = "--";
@@ -324,16 +317,9 @@
       secondsEl.textContent = "--";
     }
 
-    /**
-     * Validate the selected date:
-     * - It must be present.
-     * - It must not be in the future.
-     * Returns a Date object if valid, otherwise null.
-     */
     function getValidBirthDate() {
       const value = dobInput.value;
 
-      // No date selected
       if (!value) {
         errorMessage.textContent = "Please select your date of birth.";
         resetDisplay();
@@ -343,7 +329,6 @@
       const birthDate = new Date(value);
       const now = new Date();
 
-      // If birth date is in the future
       if (birthDate.getTime() > now.getTime()) {
         errorMessage.textContent = "Date of birth cannot be in the future.";
         resetDisplay();
@@ -354,20 +339,9 @@
       return birthDate;
     }
 
-    /**
-     * Compute the age difference between a birth date and "now"
-     * broken down into years, months, days, hours, minutes, and seconds.
-     *
-     * Approach:
-     * 1. Start from the birth date.
-     * 2. Add whole years until adding another year would exceed "now".
-     * 3. Then add whole months similarly.
-     * 4. Remaining milliseconds are converted into days, hours, minutes, seconds.
-     */
     function calculateDetailedAge(birthDate) {
       const now = new Date();
 
-      // Step 1: calculate full years
       let years = now.getFullYear() - birthDate.getFullYear();
       const yearAdjusted = new Date(
         birthDate.getFullYear() + years,
@@ -378,12 +352,10 @@
         birthDate.getSeconds()
       );
 
-      // If the "year-adjusted" date is still ahead of now, subtract one year
       if (yearAdjusted > now) {
         years--;
       }
 
-      // Base date after adding full years
       const afterYears = new Date(
         birthDate.getFullYear() + years,
         birthDate.getMonth(),
@@ -393,7 +365,6 @@
         birthDate.getSeconds()
       );
 
-      // Step 2: calculate remaining full months
       let months = 0;
       let temp = new Date(afterYears);
       while (true) {
@@ -415,7 +386,6 @@
 
       const afterMonths = new Date(temp);
 
-      // Step 3: remaining time as raw milliseconds
       let remainingMs = now.getTime() - afterMonths.getTime();
 
       const msPerSecond = 1000;
@@ -437,9 +407,6 @@
       return { years, months, days, hours, minutes, seconds };
     }
 
-    /**
-     * Update the UI with the calculated age parts.
-     */
     function renderAge(age) {
       yearsEl.textContent = age.years;
       monthsEl.textContent = age.months;
@@ -449,14 +416,9 @@
       secondsEl.textContent = age.seconds;
     }
 
-    /**
-     * Start or restart the real-time age updater.
-     * It calculates immediately once and then every second.
-     */
     function startAgeTimer() {
       const birthDate = getValidBirthDate();
       if (!birthDate) {
-        // Invalid input; stop any existing timer.
         if (timerId !== null) {
           clearInterval(timerId);
           timerId = null;
@@ -464,29 +426,21 @@
         return;
       }
 
-      // Clear previous timer, if any
       if (timerId !== null) {
         clearInterval(timerId);
       }
 
-      // Initial render
       const initialAge = calculateDetailedAge(birthDate);
       renderAge(initialAge);
 
-      // Update every second in real time
       timerId = setInterval(() => {
         const age = calculateDetailedAge(birthDate);
         renderAge(age);
       }, 1000);
     }
 
-    /**
-     * Initialize date constraints and event listeners.
-     */
     function init() {
       setMaxDateToToday();
-
-      // Recalculate when the user changes the date
       dobInput.addEventListener("change", startAgeTimer);
     }
 
